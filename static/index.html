@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's My IP?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">What's My IP?</h1>
+        <div class="space-y-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">Your IP Address:</p>
+                <p id="ip" class="text-2xl font-mono text-blue-600">Loading...</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">Hostname:</p>
+                <p id="hostname" class="text-2xl font-mono text-blue-600">Loading...</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">Request Headers:</p>
+                <pre id="headers" class="text-sm font-mono text-gray-700 mt-2 whitespace-pre-wrap">Loading...</pre>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function fetchIP() {
+            try {
+                const response = await fetch('/api/ip');
+                const data = await response.json();
+                document.getElementById('ip').textContent = data.ip;
+                document.getElementById('hostname').textContent = data.hostname;
+                document.getElementById('headers').textContent = JSON.stringify(data.headers, null, 2);
+            } catch (error) {
+                console.error('Error fetching IP:', error);
+                document.getElementById('ip').textContent = 'Error loading IP';
+                document.getElementById('hostname').textContent = 'Error loading hostname';
+                document.getElementById('headers').textContent = 'Error loading headers';
+            }
+        }
+        fetchIP();
+    </script>
+</body>
+</html> 
