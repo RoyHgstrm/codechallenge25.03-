@@ -3,42 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What's My IP?</title>
+    <title>Personal Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">What's My IP?</h1>
-        <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">Your IP Address:</p>
-                <p id="ip" class="text-2xl font-mono text-blue-600">Loading...</p>
+<body class="bg-gradient-to-br from-indigo-900 to-blue-700 min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header with Time and Date -->
+        <header class="text-center mb-8">
+            <h1 id="time" class="text-6xl font-bold mb-2">00:00:00</h1>
+            <h2 id="date" class="text-2xl font-light">Monday, January 1, 2023</h2>
+        </header>
+
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <form action="https://www.google.com/search" method="GET" class="flex">
+                <input type="text" name="q" placeholder="Search Google..." 
+                       class="w-full px-5 py-3 rounded-l-lg text-gray-900 focus:outline-none">
+                <button type="submit" class="bg-white text-blue-700 px-4 rounded-r-lg hover:bg-gray-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <h3 class="text-xl font-semibold mb-4">Quick Links</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                <a href="https://github.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fab fa-github text-3xl mb-2"></i>
+                    <div>GitHub</div>
+                </a>
+                <a href="https://gmail.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fas fa-envelope text-3xl mb-2"></i>
+                    <div>Gmail</div>
+                </a>
+                <a href="https://youtube.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fab fa-youtube text-3xl mb-2"></i>
+                    <div>YouTube</div>
+                </a>
+                <a href="https://drive.google.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fab fa-google-drive text-3xl mb-2"></i>
+                    <div>Drive</div>
+                </a>
+                <a href="https://calendar.google.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fas fa-calendar text-3xl mb-2"></i>
+                    <div>Calendar</div>
+                </a>
+                <a href="https://linkedin.com" class="bg-white/10 rounded-lg p-4 text-center hover:bg-white/20 transition">
+                    <i class="fab fa-linkedin text-3xl mb-2"></i>
+                    <div>LinkedIn</div>
+                </a>
             </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">Hostname:</p>
-                <p id="hostname" class="text-2xl font-mono text-blue-600">Loading...</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">Request Headers:</p>
-                <pre id="headers" class="text-sm font-mono text-gray-700 mt-2 whitespace-pre-wrap">Loading...</pre>
+        </div>
+
+        <!-- IP Information Card -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
+                <h3 class="text-xl font-semibold mb-4">Connection Info</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white/10 p-4 rounded-lg">
+                        <p class="text-sm text-white/70">Your IP Address:</p>
+                        <p id="ip" class="text-xl font-mono">Loading...</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-lg">
+                        <p class="text-sm text-white/70">Hostname:</p>
+                        <p id="hostname" class="text-xl font-mono">Loading...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
+        // Update time and date
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Time
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // Date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString(undefined, options);
+        }
+        
+        // Update time every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Fetch IP information
         async function fetchIP() {
             try {
                 const response = await fetch('/api/ip');
                 const data = await response.json();
                 document.getElementById('ip').textContent = data.ip;
                 document.getElementById('hostname').textContent = data.hostname;
-                document.getElementById('headers').textContent = JSON.stringify(data.headers, null, 2);
             } catch (error) {
                 console.error('Error fetching IP:', error);
                 document.getElementById('ip').textContent = 'Error loading IP';
                 document.getElementById('hostname').textContent = 'Error loading hostname';
-                document.getElementById('headers').textContent = 'Error loading headers';
             }
         }
+        
         fetchIP();
     </script>
 </body>

@@ -34,8 +34,7 @@ async def get_ip(request: Request):
     
     return {
         "ip": client_ip,
-        "hostname": hostname,
-        "headers": dict(request.headers)
+        "hostname": hostname
     }
 
 if __name__ == "__main__":
