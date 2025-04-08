@@ -7,6 +7,7 @@ import socket
 from typing import List, Dict
 from pydantic import BaseModel
 import os
+from pymongo import MongoClient
 
 PORT = 8181
 
@@ -15,15 +16,21 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-rooms = [
-    {"id": 1, "number": "101", "type": "Single", "price": 100},
-    {"id": 2, "number": "102", "type": "Single", "price": 100},
-    {"id": 3, "number": "201", "type": "Double", "price": 150},
-    {"id": 4, "number": "202", "type": "Double", "price": 150},
-    {"id": 5, "number": "301", "type": "Suite", "price": 250},
-]
+# Connect to MongoDB
+client = MongoClient('mongodb://localhost:27017/')
+db = client['hotel_db']
+rooms_collection = db['rooms']
+bookings_collection = db['bookings']
 
-bookings = []
+# Initialize rooms if collection is empty
+if rooms_collection.count_documents({}) == 0:
+    rooms_collection.insert_many([
+        {"id": 1, "number": "101", "type": "Single", "price": 100},
+        {"id": 2, "number": "102", "type": "Single", "price": 100},
+        {"id": 3, "number": "201", "type": "Double", "price": 150},
+        {"id": 4, "number": "202", "type": "Double", "price": 150},
+        {"id": 5, "number": "301", "type": "Suite", "price": 250},
+    ])
 
 class Booking(BaseModel):
     room_id: int
@@ -44,6 +51,10 @@ async def read_root():
 async def hotel_page():
     return FileResponse("static/hotel.html")
 
+@app.get("/stats")
+async def stats_page():
+    return FileResponse("static/stats.html")
+
 @app.get("/api/ip")
 async def get_ip(request: Request):
     client_ip = get_client_ip(request)
@@ -59,25 +70,52 @@ async def get_ip(request: Request):
 
 @app.get("/api/rooms")
 async def get_rooms():
+    rooms = list(rooms_collection.find({}, {"_id": 0}))
     return rooms
 
 @app.get("/api/bookings")
 async def get_bookings():
+    bookings = list(bookings_collection.find({}, {"_id": 0}))
     return bookings
+
+@app.get("/api/stats")
+async def get_stats():
+    # Get room statistics
+    total_rooms = rooms_collection.count_documents({})
+    
+    # Count room types
+    room_types = {
+        "Single": rooms_collection.count_documents({"type": "Single"}),
+        "Double": rooms_collection.count_documents({"type": "Double"}),
+        "Suite": rooms_collection.count_documents({"type": "Suite"})
+    }
+    
+    # Calculate average price
+    room_prices = [room["price"] for room in rooms_collection.find({}, {"price": 1, "_id": 0})]
+    avg_price = sum(room_prices) / len(room_prices) if room_prices else 0
+    
+    # Get booking statistics
+    total_bookings = bookings_collection.count_documents({})
+    
+    return {
+        "total_rooms": total_rooms,
+        "total_bookings": total_bookings,
+        "room_types": room_types,
+        "average_room_price": avg_price,
+        "server_status": "Online"
+    }
 
 @app.post("/api/bookings")
 async def create_booking(booking: Booking):
-    room = None
-    for r in rooms:
-        if r["id"] == booking.room_id:
-            room = r
-            break
+    room = rooms_collection.find_one({"id": booking.room_id})
             
     if not room:
         return {"error": "Room not found"}
     
+    booking_id = bookings_collection.count_documents({}) + 1
+    
     new_booking = {
-        "id": len(bookings) + 1,
+        "id": booking_id,
         "room_id": booking.room_id,
         "room_number": room["number"],
         "room_type": room["type"],
@@ -85,7 +123,8 @@ async def create_booking(booking: Booking):
         "guest_info": booking.guest_info
     }
     
-    bookings.append(new_booking)
+    bookings_collection.insert_one(new_booking)
+    new_booking.pop("_id", None)
     return new_booking
 
 if __name__ == "__main__":
