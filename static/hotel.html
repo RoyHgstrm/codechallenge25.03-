@@ -109,18 +109,82 @@
                         
                         var date = new Date(booking.date).toLocaleDateString();
                         
+                        var ratingSelect = document.createElement('select');
+                        ratingSelect.className = 'star-rating mt-2 p-1 border border-gray-300 rounded';
+                        ratingSelect.dataset.bookingId = booking.id;
+                        
+                        var defaultOption = document.createElement('option');
+                        defaultOption.value = "";
+                        defaultOption.text = booking.stars ? `Current: ${booking.stars} stars` : "Rate this stay";
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        ratingSelect.appendChild(defaultOption);
+                        
+                        for (var j = 1; j <= 5; j++) {
+                            var option = document.createElement('option');
+                            option.value = j;
+                            option.text = j + (j === 1 ? ' star' : ' stars');
+                            ratingSelect.appendChild(option);
+                        }
+                        
+                        var starsDisplay = '';
+                        if (booking.stars) {
+                            starsDisplay = '<div class="text-yellow-500 mt-1">';
+                            for (var s = 0; s < booking.stars; s++) {
+                                starsDisplay += '<i class="fas fa-star"></i>';
+                            }
+                            for (var s = booking.stars; s < 5; s++) {
+                                starsDisplay += '<i class="far fa-star"></i>';
+                            }
+                            starsDisplay += '</div>';
+                        }
+                        
                         li.innerHTML = 
                             '<div>Room ' + booking.room_number + ' (' + booking.room_type + ')</div>' +
                             '<div>Date: ' + date + '</div>' +
-                            '<div>Guest: ' + booking.guest_info + '</div>';
+                            '<div>Guest: ' + booking.guest_info + '</div>' +
+                            starsDisplay +
+                            '<div class="mt-2">Rate this stay: </div>';
                         
+                        li.appendChild(ratingSelect);
                         bookings.appendChild(li);
+                        
+                        ratingSelect.addEventListener('change', function(e) {
+                            submitRating(e.target.dataset.bookingId, e.target.value);
+                        });
                     }
                 })
                 .catch(function(error) {
                     console.error('Error:', error);
                     bookings.innerHTML = '<li class="p-3 bg-gray-100 rounded text-center">Error loading bookings</li>';
                 });
+        }
+
+        function submitRating(bookingId, stars) {
+            fetch('/api/bookings/' + bookingId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    stars: parseInt(stars)
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    getBookings();
+                    alert('Thank you for your review!');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('Error submitting rating. Please try again.');
+            });
         }
 
         form.onsubmit = function(e) {

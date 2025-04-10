@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -16,13 +16,11 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
 db = client['hotel_db']
 rooms_collection = db['rooms']
 bookings_collection = db['bookings']
 
-# Initialize rooms if collection is empty
 if rooms_collection.count_documents({}) == 0:
     rooms_collection.insert_many([
         {"id": 1, "number": "101", "type": "Single", "price": 100},
@@ -36,6 +34,9 @@ class Booking(BaseModel):
     room_id: int
     date: str
     guest_info: str
+
+class BookingReview(BaseModel):
+    stars: int
 
 def get_client_ip(request: Request):
     forwarded_for = request.headers.get("X-Forwarded-For")
@@ -80,29 +81,46 @@ async def get_bookings():
 
 @app.get("/api/stats")
 async def get_stats():
-    # Get room statistics
     total_rooms = rooms_collection.count_documents({})
     
-    # Count room types
     room_types = {
         "Single": rooms_collection.count_documents({"type": "Single"}),
         "Double": rooms_collection.count_documents({"type": "Double"}),
         "Suite": rooms_collection.count_documents({"type": "Suite"})
     }
     
-    # Calculate average price
     room_prices = [room["price"] for room in rooms_collection.find({}, {"price": 1, "_id": 0})]
     avg_price = sum(room_prices) / len(room_prices) if room_prices else 0
     
-    # Get booking statistics
     total_bookings = bookings_collection.count_documents({})
+    
+    bookings_with_reviews = list(bookings_collection.find({"stars": {"$exists": True}}, {"stars": 1, "_id": 0}))
+    total_reviews = len(bookings_with_reviews)
+    
+    review_stats = {
+        "total_reviews": total_reviews,
+        "average_rating": 0,
+        "distribution": {
+            "1": 0, "2": 0, "3": 0, "4": 0, "5": 0
+        }
+    }
+    
+    if total_reviews > 0:
+        total_stars = sum(booking["stars"] for booking in bookings_with_reviews)
+        review_stats["average_rating"] = total_stars / total_reviews
+        
+        for booking in bookings_with_reviews:
+            stars = booking["stars"]
+            if 1 <= stars <= 5:
+                review_stats["distribution"][str(stars)] += 1
     
     return {
         "total_rooms": total_rooms,
         "total_bookings": total_bookings,
         "room_types": room_types,
         "average_room_price": avg_price,
-        "server_status": "Online"
+        "server_status": "Online",
+        "review_stats": review_stats
     }
 
 @app.post("/api/bookings")
@@ -126,6 +144,26 @@ async def create_booking(booking: Booking):
     bookings_collection.insert_one(new_booking)
     new_booking.pop("_id", None)
     return new_booking
+
+@app.put("/api/bookings/{booking_id}")
+async def update_booking_review(booking_id: int, review: BookingReview):
+    if review.stars < 1 or review.stars > 5:
+        raise HTTPException(status_code=400, detail="Star rating must be between 1 and 5")
+    
+    booking = bookings_collection.find_one({"id": booking_id})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    result = bookings_collection.update_one(
+        {"id": booking_id},
+        {"$set": {"stars": review.stars}}
+    )
+    
+    if result.modified_count == 0:
+        return {"message": "No changes made to the booking"}
+    
+    updated_booking = bookings_collection.find_one({"id": booking_id}, {"_id": 0})
+    return updated_booking
 
 if __name__ == "__main__":
     uvicorn.run(
