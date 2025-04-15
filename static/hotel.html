@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Booking System</title>
+    <title>Hotellbokningssystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -12,15 +12,15 @@
         <header class="bg-blue-700 text-white p-4 rounded-lg mb-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-bold">Hotel Booking System</h1>
-                    <p class="text-sm">Reception Management Interface</p>
+                    <h1 class="text-2xl font-bold">Hotellbokningssystem</h1>
+                    <p class="text-sm">Gränssnitt för receptionshantering</p>
                 </div>
                 <div class="flex space-x-4">
                     <a href="/" class="text-white hover:text-blue-200">
-                        <i class="fas fa-home mr-1"></i> Home
+                        <i class="fas fa-home mr-1"></i> Hem
                     </a>
                     <a href="/stats" class="text-white hover:text-blue-200">
-                        <i class="fas fa-chart-bar mr-1"></i> Stats
+                        <i class="fas fa-chart-bar mr-1"></i> Statistik
                     </a>
                 </div>
             </div>
@@ -28,210 +28,242 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <section class="bg-white p-6 rounded-lg">
-                <h2 class="text-xl mb-4 text-blue-800">New Booking</h2>
+                <h2 class="text-xl mb-4 text-blue-800">Ny Bokning</h2>
                 <form id="bookingForm" class="space-y-4">
                     <div>
-                        <label for="roomSelect" class="block text-gray-700 mb-1">Select Room</label>
+                        <label for="roomSelect" class="block text-gray-700 mb-1">Välj Rum</label>
                         <select id="roomSelect" class="w-full p-2 border border-gray-300 rounded">
-                            <option value="">-- Select a room --</option>
+                            <option value="">-- Välj ett rum --</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label for="bookingDate" class="block text-gray-700 mb-1">Booking Date</label>
+                        <label for="bookingDate" class="block text-gray-700 mb-1">Bokningsdatum</label>
                         <input type="date" id="bookingDate" class="w-full p-2 border border-gray-300 rounded" required>
                     </div>
                     
                     <div>
-                        <label for="guestInfo" class="block text-gray-700 mb-1">Guest Information</label>
-                        <input type="text" id="guestInfo" placeholder="Guest name and details" class="w-full p-2 border border-gray-300 rounded" required>
+                        <label for="guestInfo" class="block text-gray-700 mb-1">Gästinformation</label>
+                        <input type="text" id="guestInfo" placeholder="Gästens namn och detaljer" class="w-full p-2 border border-gray-300 rounded" required>
                     </div>
                     
                     <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">
-                        Save Booking
+                        Spara Bokning
                     </button>
                 </form>
             </section>
 
             <section class="bg-white p-6 rounded-lg">
-                <h2 class="text-xl mb-4 text-blue-800">Current Bookings</h2>
+                <h2 class="text-xl mb-4 text-blue-800">Aktuella Bokningar</h2>
                 <ul id="bookingsList" class="space-y-2 max-h-96 overflow-y-auto">
-                    <li class="p-3 bg-gray-100 rounded text-center text-gray-500">Loading bookings...</li>
+                    <li class="p-3 bg-gray-100 rounded text-center text-gray-500">Laddar bokningar...</li>
                 </ul>
             </section>
         </div>
     </div>
 
     <script>
-        var rooms = document.getElementById('roomSelect');
-        var form = document.getElementById('bookingForm');
-        var bookings = document.getElementById('bookingsList');
+        // Hämta referenser till HTML-element
+        const roomSelectElement = document.getElementById('roomSelect');
+        const bookingFormElement = document.getElementById('bookingForm');
+        const bookingsListElement = document.getElementById('bookingsList');
 
-        function getRooms() {
+        // Hämta rum från API och fyll i dropdown
+        function fetchRooms() {
             fetch('/api/rooms')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    rooms.innerHTML = '<option value="">-- Select a room --</option>';
+                .then(response => response.json())
+                .then(roomsData => {
+                    roomSelectElement.innerHTML = '<option value="">-- Välj ett rum --</option>'; // Rensa gamla alternativ
                     
-                    for(var i = 0; i < data.length; i++) {
-                        var room = data[i];
-                        var option = document.createElement('option');
-                        option.value = room.id;
-                        option.textContent = room.number + ' - ' + room.type + ' ($' + room.price + '/night)';
-                        rooms.appendChild(option);
+                    // Lägg till varje rum som ett alternativ
+                    for (let i = 0; i < roomsData.length; i++) {
+                        const room = roomsData[i];
+                        const optionElement = document.createElement('option');
+                        optionElement.value = room.id;
+                        optionElement.textContent = `${room.number} - ${room.type} ($${room.price}/natt)`;
+                        roomSelectElement.appendChild(optionElement);
                     }
                 })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                    rooms.innerHTML = '<option value="">Error loading rooms</option>';
+                .catch(error => {
+                    console.error('Fel vid hämtning av rum:', error);
+                    roomSelectElement.innerHTML = '<option value="">Kunde inte ladda rum</option>';
                 });
         }
 
-        function getBookings() {
+        // Hämta bokningar från API och visa dem
+        function fetchBookings() {
             fetch('/api/bookings')
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.length === 0) {
-                        bookings.innerHTML = '<li class="p-3 bg-gray-100 rounded text-center">No bookings found</li>';
+                .then(response => response.json())
+                .then(bookingsData => {
+                    bookingsListElement.innerHTML = ''; // Rensa listan
+                    
+                    // Om inga bokningar finns
+                    if (bookingsData.length === 0) {
+                        const noBookingItem = document.createElement('li');
+                        noBookingItem.className = 'p-3 bg-gray-100 rounded text-center';
+                        noBookingItem.textContent = 'Inga bokningar hittades';
+                        bookingsListElement.appendChild(noBookingItem);
                         return;
                     }
                     
-                    bookings.innerHTML = '';
-                    
-                    for(var i = 0; i < data.length; i++) {
-                        var booking = data[i];
-                        var li = document.createElement('li');
-                        li.className = 'p-3 bg-gray-100 rounded';
-                        
-                        var date = new Date(booking.date).toLocaleDateString();
-                        
-                        var ratingSelect = document.createElement('select');
-                        ratingSelect.className = 'star-rating mt-2 p-1 border border-gray-300 rounded';
-                        ratingSelect.dataset.bookingId = booking.id;
-                        
-                        var defaultOption = document.createElement('option');
-                        defaultOption.value = "";
-                        defaultOption.text = booking.stars ? `Current: ${booking.stars} stars` : "Rate this stay";
-                        defaultOption.disabled = true;
-                        defaultOption.selected = true;
-                        ratingSelect.appendChild(defaultOption);
-                        
-                        for (var j = 1; j <= 5; j++) {
-                            var option = document.createElement('option');
-                            option.value = j;
-                            option.text = j + (j === 1 ? ' star' : ' stars');
-                            ratingSelect.appendChild(option);
-                        }
-                        
-                        var starsDisplay = '';
-                        if (booking.stars) {
-                            starsDisplay = '<div class="text-yellow-500 mt-1">';
-                            for (var s = 0; s < booking.stars; s++) {
-                                starsDisplay += '<i class="fas fa-star"></i>';
-                            }
-                            for (var s = booking.stars; s < 5; s++) {
-                                starsDisplay += '<i class="far fa-star"></i>';
-                            }
-                            starsDisplay += '</div>';
-                        }
-                        
-                        li.innerHTML = 
-                            '<div>Room ' + booking.room_number + ' (' + booking.room_type + ')</div>' +
-                            '<div>Date: ' + date + '</div>' +
-                            '<div>Guest: ' + booking.guest_info + '</div>' +
-                            starsDisplay +
-                            '<div class="mt-2">Rate this stay: </div>';
-                        
-                        li.appendChild(ratingSelect);
-                        bookings.appendChild(li);
-                        
-                        ratingSelect.addEventListener('change', function(e) {
-                            submitRating(e.target.dataset.bookingId, e.target.value);
-                        });
+                    // Skapa ett listelement för varje bokning
+                    for (let i = 0; i < bookingsData.length; i++) {
+                        const booking = bookingsData[i];
+                        const bookingItem = createBookingListItem(booking);
+                        bookingsListElement.appendChild(bookingItem);
                     }
                 })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                    bookings.innerHTML = '<li class="p-3 bg-gray-100 rounded text-center">Error loading bookings</li>';
+                .catch(error => {
+                    console.error('Fel vid hämtning av bokningar:', error);
+                    bookingsListElement.innerHTML = '<li class="p-3 bg-gray-100 rounded text-center">Kunde inte ladda bokningar</li>';
                 });
         }
 
+        // Skapa ett HTML-listelement för en bokning
+        function createBookingListItem(booking) {
+            const listItem = document.createElement('li');
+            listItem.className = 'p-3 bg-gray-100 rounded';
+
+            const bookingDate = new Date(booking.date).toLocaleDateString();
+
+            // Bokningsinformation
+            listItem.innerHTML = `
+                <div>Rum ${booking.room_number} (${booking.room_type})</div>
+                <div>Datum: ${bookingDate}</div>
+                <div>Gäst: ${booking.guest_info}</div>
+            `;
+
+            // Hantera recension/betyg
+            const ratingContainer = document.createElement('div');
+            ratingContainer.className = 'mt-2';
+            
+            // Visa befintliga stjärnor om de finns
+            if (booking.stars) {
+                const starsDisplay = document.createElement('div');
+                starsDisplay.className = 'text-yellow-500 mt-1';
+                for (let s = 0; s < 5; s++) {
+                    const starIcon = document.createElement('i');
+                    starIcon.className = s < booking.stars ? 'fas fa-star' : 'far fa-star'; // Fylld eller tom stjärna
+                    starsDisplay.appendChild(starIcon);
+                }
+                ratingContainer.appendChild(starsDisplay);
+            } else {
+                 ratingContainer.innerHTML += '<div class="text-sm text-gray-600">Betygsätt vistelsen:</div>';
+            }
+
+            // Dropdown för att välja betyg
+            const ratingSelect = document.createElement('select');
+            ratingSelect.className = 'star-rating mt-1 p-1 border border-gray-300 rounded text-sm';
+            ratingSelect.dataset.bookingId = booking.id;
+
+            // Standardalternativ i dropdown
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.text = booking.stars ? `Nuvarande: ${booking.stars} stjärnor` : "Välj Betyg";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            ratingSelect.appendChild(defaultOption);
+
+            // Alternativ 1-5 stjärnor
+            for (let j = 1; j <= 5; j++) {
+                const option = document.createElement('option');
+                option.value = j;
+                option.text = j + (j === 1 ? ' stjärna' : ' stjärnor');
+                ratingSelect.appendChild(option);
+            }
+
+            // Lyssna på ändringar i betygs-dropdown
+            ratingSelect.addEventListener('change', handleRatingChange);
+            ratingContainer.appendChild(ratingSelect);
+            listItem.appendChild(ratingContainer);
+
+            return listItem;
+        }
+
+        // Hantera ändring av betyg
+        function handleRatingChange(event) {
+            const bookingId = event.target.dataset.bookingId;
+            const stars = event.target.value;
+            submitRating(bookingId, stars); // Skicka betyget till API
+        }
+
+        // Skicka betyg till API
         function submitRating(bookingId, stars) {
             fetch('/api/bookings/' + bookingId, {
-                method: 'PUT',
+                method: 'PUT', // Använd PUT för att uppdatera
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    stars: parseInt(stars)
+                    stars: parseInt(stars) // Konvertera till heltal
                 })
             })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
+            .then(response => response.json())
+            .then(data => {
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    alert('Fel vid uppdatering av betyg: ' + data.error);
                 } else {
-                    getBookings();
-                    alert('Thank you for your review!');
+                    fetchBookings(); // Ladda om bokningslistan
+                    alert('Tack för din recension!');
                 }
             })
-            .catch(function(error) {
-                console.error('Error:', error);
-                alert('Error submitting rating. Please try again.');
+            .catch(error => {
+                console.error('Fel vid skickande av betyg:', error);
+                alert('Fel vid skickande av betyg. Försök igen.');
             });
         }
 
-        form.onsubmit = function(e) {
-            e.preventDefault();
+        // Hantera när bokningsformuläret skickas
+        bookingFormElement.addEventListener('submit', function(event) {
+            event.preventDefault(); // Förhindra standardformulär skickning
             
-            var roomId = parseInt(rooms.value);
-            var date = document.getElementById('bookingDate').value;
-            var guest = document.getElementById('guestInfo').value;
+            // Hämta värden från formuläret
+            const selectedRoomId = parseInt(roomSelectElement.value);
+            const bookingDateValue = document.getElementById('bookingDate').value;
+            const guestInfoValue = document.getElementById('guestInfo').value;
             
-            if (!roomId || !date || !guest) {
-                alert('Please fill out all fields');
+            // Validera att alla fält är ifyllda
+            if (!selectedRoomId || !bookingDateValue || !guestInfoValue) {
+                alert('Vänligen fyll i alla bokningsfält');
                 return;
             }
             
+            // Skapa bokningsdata objekt
+            const bookingData = {
+                room_id: selectedRoomId,
+                date: bookingDateValue,
+                guest_info: guestInfoValue
+            };
+            
+            // Skicka bokningsdata till API
             fetch('/api/bookings', {
-                method: 'POST',
+                method: 'POST', // Använd POST för att skapa
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    room_id: roomId,
-                    date: date,
-                    guest_info: guest
-                })
+                body: JSON.stringify(bookingData)
             })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
+            .then(response => response.json())
+            .then(data => {
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    alert('Fel vid skapande av bokning: ' + data.error);
                 } else {
-                    form.reset();
-                    getBookings();
-                    alert('Booking saved!');
+                    bookingFormElement.reset(); // Återställ formuläret
+                    fetchBookings(); // Ladda om bokningslistan
+                    alert('Bokning sparad!');
                 }
             })
-            .catch(function(error) {
-                console.error('Error:', error);
-                alert('Error saving booking. Please try again.');
+            .catch(error => {
+                console.error('Fel vid skapande av bokning:', error);
+                alert('Fel vid sparande av bokning. Försök igen.');
             });
-        };
+        });
 
-        window.onload = function() {
-            getRooms();
-            getBookings();
-        };
+        // När sidan laddas, hämta rum och bokningar
+        window.addEventListener('load', function() {
+            fetchRooms();
+            fetchBookings();
+        });
     </script>
 </body>
 </html> 

@@ -13,12 +13,12 @@
         <header class="bg-blue-700 text-white p-4 rounded-lg mb-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-bold">Hotel System Statistics</h1>
-                    <p class="text-sm">Backend Metrics Dashboard</p>
+                    <h1 class="text-2xl font-bold">Hotellsystem Statistik</h1>
+                    <p class="text-sm">Backend Mätvärden Dashboard</p>
                 </div>
                 <div>
                     <a href="/hotel" class="text-white hover:text-blue-200">
-                        <i class="fas fa-arrow-left mr-1"></i> Back to Hotel
+                        <i class="fas fa-arrow-left mr-1"></i> Tillbaka till Hotell
                     </a>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                         <i class="fas fa-door-open text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm font-medium">Total Rooms</p>
+                        <p class="text-gray-500 text-sm font-medium">Totalt antal rum</p>
                         <h3 id="totalRooms" class="text-2xl font-bold text-gray-800">-</h3>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                         <i class="fas fa-calendar-check text-green-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm font-medium">Total Bookings</p>
+                        <p class="text-gray-500 text-sm font-medium">Totala bokningar</p>
                         <h3 id="totalBookings" class="text-2xl font-bold text-gray-800">-</h3>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         <i class="fas fa-money-bill-wave text-yellow-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm font-medium">Avg. Room Price</p>
+                        <p class="text-gray-500 text-sm font-medium">Genomsnittspris</p>
                         <h3 id="avgPrice" class="text-2xl font-bold text-gray-800">-</h3>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         <i class="fas fa-server text-purple-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm font-medium">Server Status</p>
+                        <p class="text-gray-500 text-sm font-medium">Serverstatus</p>
                         <h3 id="serverStatus" class="text-2xl font-bold text-gray-800">-</h3>
                     </div>
                 </div>
@@ -77,7 +77,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <section class="bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl mb-4 text-blue-800 font-semibold">
-                    <i class="fas fa-chart-pie mr-2"></i> Room Type Distribution
+                    <i class="fas fa-chart-pie mr-2"></i> Fördelning rumstyper
                 </h2>
                 <div class="h-64">
                     <canvas id="roomTypeChart"></canvas>
@@ -86,11 +86,11 @@
 
             <section class="bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl mb-4 text-blue-800 font-semibold">
-                    <i class="fas fa-database mr-2"></i> MongoDB Connection Stats
+                    <i class="fas fa-database mr-2"></i> MongoDB Anslutningsstatus
                 </h2>
                 <div id="mongoStats" class="space-y-4">
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-medium">Database</span>
+                        <span class="font-medium">Databas</span>
                         <span class="font-semibold">hotel_db</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -98,14 +98,14 @@
                         <span class="font-semibold">rooms, bookings</span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-medium">Connection</span>
+                        <span class="font-medium">Anslutning</span>
                         <span class="font-semibold text-green-600">
-                            <i class="fas fa-circle text-xs mr-1"></i> Connected
+                            <i class="fas fa-circle text-xs mr-1"></i> Ansluten
                         </span>
                     </div>
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span class="font-medium">Last Updated</span>
-                        <span id="lastUpdated" class="font-semibold"></span>
+                        <span class="font-medium">Senast uppdaterad</span>
+                        <span id="lastUpdated" class="font-semibold">Aldrig</span>
                     </div>
                 </div>
             </section>
@@ -114,23 +114,24 @@
         <div class="grid grid-cols-1 gap-6">
             <section class="bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl mb-4 text-blue-800 font-semibold">
-                    <i class="fas fa-star mr-2"></i> Guest Reviews
+                    <i class="fas fa-star mr-2"></i> Gästrecensioner
                 </h2>
                 <div class="flex flex-wrap gap-6">
                     <div class="flex-1 min-w-[300px]">
-                        <h3 class="text-lg mb-2 text-gray-700">Star Rating Distribution</h3>
+                        <h3 class="text-lg mb-2 text-gray-700">Stjärnbetygsfördelning</h3>
                         <div class="h-64">
                             <canvas id="ratingDistributionChart"></canvas>
                         </div>
                     </div>
                     <div class="flex-1 min-w-[300px]">
-                        <h3 class="text-lg mb-2 text-gray-700">Average Rating</h3>
+                        <h3 class="text-lg mb-2 text-gray-700">Genomsnittsbetyg</h3>
                         <div class="bg-gray-50 p-6 rounded-lg text-center">
-                            <div id="avgRating" class="text-4xl font-bold text-blue-700 mb-2">-</div>
+                            <div id="avgRating" class="text-4xl font-bold text-blue-700 mb-2">0.0</div>
                             <div id="starDisplay" class="text-2xl text-yellow-500 mb-4">
+                                <i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
                             </div>
                             <div id="ratingCount" class="text-gray-500">
-                                Based on <span id="reviewCount">0</span> reviews
+                                Baserat på <span id="reviewCount">0</span> recensioner
                             </div>
                         </div>
                     </div>
@@ -140,57 +141,83 @@
     </div>
 
     <script>
-        let roomTypeChart;
-        let ratingDistributionChart;
-        
-        function getStats() {
+        // Referenser till diagram-instanser
+        let roomTypeChartInstance = null;
+        let ratingDistributionChartInstance = null;
+        const REFRESH_INTERVAL_MS = 30000; // Uppdateringsintervall (30 sekunder)
+
+        // Hämta statistikdata från API
+        function fetchStatsData() {
             fetch('/api/stats')
-                .then(function(response) {
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Nätverksfel');
+                    }
                     return response.json();
                 })
-                .then(function(data) {
-                    document.getElementById('totalRooms').textContent = data.total_rooms;
-                    document.getElementById('totalBookings').textContent = data.total_bookings;
-                    document.getElementById('avgPrice').textContent = '$' + data.average_room_price.toFixed(2);
-                    
-                    const serverStatusEl = document.getElementById('serverStatus');
-                    if (data.server_status === 'Online') {
-                        serverStatusEl.innerHTML = '<span class="text-green-600">Online</span>';
-                    } else {
-                        serverStatusEl.innerHTML = '<span class="text-red-600">Offline</span>';
-                    }
-                    
-                    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
-                    
-                    updateRoomTypeChart(data.room_types);
-                    
-                    if (data.review_stats) {
-                        updateReviewStats(data.review_stats);
-                    }
+                .then(data => {
+                    updateDashboardStats(data); // Uppdatera sifferkorten
+                    updateRoomTypeChart(data.room_types || {}); // Uppdatera rumstypsdiagrammet
+                    updateReviewStats(data.review_stats || {}); // Uppdatera recensionsstatistiken
+                    updateTimestamp(); // Uppdatera tidsstämpeln
                 })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                    alert('Error fetching stats. Please try again.');
+                .catch(error => {
+                    console.error('Fel vid hämtning av statistik:', error);
+                    displayErrorState(); // Visa feltillstånd i UI
                 });
         }
-        
-        function updateRoomTypeChart(roomTypes) {
-            const ctx = document.getElementById('roomTypeChart').getContext('2d');
-            
-            if (roomTypeChart) {
-                roomTypeChart.destroy();
+
+        // Uppdatera sifferkorten på dashboarden
+        function updateDashboardStats(data) {
+            document.getElementById('totalRooms').textContent = data.total_rooms || '-';
+            document.getElementById('totalBookings').textContent = data.total_bookings || '-';
+            document.getElementById('avgPrice').textContent = data.average_room_price ? `$${data.average_room_price.toFixed(2)}` : '-';
+
+            const serverStatusElement = document.getElementById('serverStatus');
+            if (data.server_status === 'Online') {
+                serverStatusElement.innerHTML = '<span class="text-green-600">Online</span>';
+            } else {
+                serverStatusElement.innerHTML = '<span class="text-red-600">Offline</span>';
             }
-            
-            roomTypeChart = new Chart(ctx, {
-                type: 'doughnut',
+        }
+
+        // Uppdatera tidsstämpeln för senaste uppdatering
+        function updateTimestamp() {
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Visa feltillstånd i UI om API-anrop misslyckas
+        function displayErrorState() {
+            document.getElementById('totalRooms').textContent = 'Fel';
+            document.getElementById('totalBookings').textContent = 'Fel';
+            document.getElementById('avgPrice').textContent = 'Fel';
+            document.getElementById('serverStatus').innerHTML = '<span class="text-red-600">Fel</span>';
+            document.getElementById('lastUpdated').textContent = 'Fel vid hämtning';
+            // Här kan man även rensa/visa fel i diagrammen
+        }
+
+        // Uppdatera diagrammet för rumstypsfördelning
+        function updateRoomTypeChart(roomTypes) {
+            const context = document.getElementById('roomTypeChart').getContext('2d');
+            const labels = Object.keys(roomTypes); // Rumstyper (Single, Double, Suite)
+            const dataValues = Object.values(roomTypes); // Antal per typ
+
+            // Förstör gammalt diagram om det finns
+            if (roomTypeChartInstance) {
+                roomTypeChartInstance.destroy();
+            }
+
+            // Skapa nytt diagram
+            roomTypeChartInstance = new Chart(context, {
+                type: 'doughnut', // Typ av diagram
                 data: {
-                    labels: Object.keys(roomTypes),
+                    labels: labels,
                     datasets: [{
-                        data: Object.values(roomTypes),
+                        data: dataValues,
                         backgroundColor: [
-                            '#3B82F6',
-                            '#10B981',
-                            '#8B5CF6'
+                            '#3B82F6', // Blå
+                            '#10B981', // Grön
+                            '#8B5CF6'  // Lila
                         ],
                         borderColor: '#FFFFFF',
                         borderWidth: 2
@@ -200,15 +227,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
+                        legend: { position: 'bottom' }, // Placering av förklaring
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                                // Anpassa text i tooltip
+                                label: function(tooltipItem) {
+                                    const label = tooltipItem.label || '';
+                                    const value = tooltipItem.raw || 0;
+                                    const total = tooltipItem.chart.getDatasetMeta(0).total || 1; // Undvik division med noll
                                     const percentage = Math.round((value / total) * 100);
                                     return `${label}: ${value} (${percentage}%)`;
                                 }
@@ -218,60 +244,67 @@
                 }
             });
         }
-        
+
+        // Uppdatera recensionsstatistiken (genomsnitt och fördelning)
         function updateReviewStats(reviewStats) {
-            const avgRating = reviewStats.average_rating || 0;
-            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
-            document.getElementById('reviewCount').textContent = reviewStats.total_reviews || 0;
+            const averageRating = reviewStats.average_rating || 0;
+            const totalReviews = reviewStats.total_reviews || 0;
+            const distribution = reviewStats.distribution || { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+
+            // Uppdatera textfält
+            document.getElementById('avgRating').textContent = averageRating.toFixed(1);
+            document.getElementById('reviewCount').textContent = totalReviews;
+
+            updateStarDisplay(averageRating); // Uppdatera stjärnvisningen
+            updateRatingDistributionChart(distribution); // Uppdatera fördelningsdiagrammet
+        }
+
+        // Uppdatera den visuella stjärnvisningen baserat på betyg
+        function updateStarDisplay(rating) {
+            const starDisplayElement = document.getElementById('starDisplay');
+            starDisplayElement.innerHTML = ''; // Rensa gamla stjärnor
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating - fullStars >= 0.25; // Tröskel för halv stjärna
             
-            const starDisplay = document.getElementById('starDisplay');
-            starDisplay.innerHTML = '';
-            
-            const fullStars = Math.floor(avgRating);
-            const hasHalfStar = avgRating - fullStars >= 0.5;
-            
-            for (let i = 0; i < fullStars; i++) {
-                starDisplay.innerHTML += '<i class="fas fa-star"></i>';
+            // Loopa 5 gånger för att rita stjärnor
+            for (let i = 0; i < 5; i++) {
+                const starIcon = document.createElement('i');
+                if (i < fullStars) {
+                    starIcon.className = 'fas fa-star'; // Fylld stjärna
+                } else if (i === fullStars && hasHalfStar) {
+                    starIcon.className = 'fas fa-star-half-alt'; // Halv stjärna
+                } else {
+                    starIcon.className = 'far fa-star'; // Tom stjärna
+                }
+                starDisplayElement.appendChild(starIcon);
             }
-            
-            if (hasHalfStar) {
-                starDisplay.innerHTML += '<i class="fas fa-star-half-alt"></i>';
+        }
+
+        // Uppdatera diagrammet för betygsfördelning
+        function updateRatingDistributionChart(distribution) {
+            const context = document.getElementById('ratingDistributionChart').getContext('2d');
+            const labels = ['1★', '2★', '3★', '4★', '5★'];
+            const dataValues = labels.map((label, index) => distribution[String(index + 1)] || 0); // Hämta antal för varje betyg
+
+            // Förstör gammalt diagram
+            if (ratingDistributionChartInstance) {
+                ratingDistributionChartInstance.destroy();
             }
-            
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            for (let i = 0; i < emptyStars; i++) {
-                starDisplay.innerHTML += '<i class="far fa-star"></i>';
-            }
-            
-            const ctx = document.getElementById('ratingDistributionChart').getContext('2d');
-            
-            if (ratingDistributionChart) {
-                ratingDistributionChart.destroy();
-            }
-            
-            const distributionData = reviewStats.distribution || {
-                '1': 0, '2': 0, '3': 0, '4': 0, '5': 0
-            };
-            
-            ratingDistributionChart = new Chart(ctx, {
-                type: 'bar',
+
+            // Skapa nytt stapeldiagram
+            ratingDistributionChartInstance = new Chart(context, {
+                type: 'bar', // Typ av diagram
                 data: {
-                    labels: ['1★', '2★', '3★', '4★', '5★'],
+                    labels: labels,
                     datasets: [{
-                        label: 'Number of Reviews',
-                        data: [
-                            distributionData['1'] || 0,
-                            distributionData['2'] || 0,
-                            distributionData['3'] || 0,
-                            distributionData['4'] || 0,
-                            distributionData['5'] || 0
-                        ],
+                        label: 'Antal Recensioner',
+                        data: dataValues,
                         backgroundColor: [
-                            '#EF4444',
-                            '#F59E0B',
-                            '#FBBF24',
-                            '#34D399',
-                            '#3B82F6'
+                            '#EF4444', // Röd
+                            '#F59E0B', // Orange
+                            '#FBBF24', // Gul
+                            '#34D399', // Grön
+                            '#3B82F6'  // Blå
                         ]
                     }]
                 },
@@ -281,19 +314,18 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
+                            ticks: { precision: 0 } // Inga decimaler på y-axeln
                         }
                     }
                 }
             });
         }
-        
-        window.onload = function() {
-            getStats();
-            setInterval(getStats, 30000);
-        };
+
+        // När sidan laddas: Hämta statistik och starta intervall för automatisk uppdatering
+        window.addEventListener('load', function() {
+            fetchStatsData(); // Hämta direkt vid laddning
+            setInterval(fetchStatsData, REFRESH_INTERVAL_MS); // Hämta var 30:e sekund
+        });
     </script>
 </body>
 </html> 
